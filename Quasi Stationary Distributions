@@ -1,3 +1,9 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from numpy import linalg as LA
+from scipy import sparse
+from scipy.sparse.linalg import eigs
+
 # a few maps 
 
 def g(omega,x):
