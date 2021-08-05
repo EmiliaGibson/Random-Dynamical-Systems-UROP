@@ -66,14 +66,14 @@ def g4(omega, x):
 def MCQSD(g,N,N2):
     '''
     parameters: 
-    g  : function outputting a map from Ω=[-m,m] x domain --> R, lower bound of domain, upper bound of domain, m  
+    g  : function outputting a map from Ω=[-m,m] x domain --> R, domain, m  
     N  : integer - length of trajectory  
     N2  : integer - number of subintervals to divide domain into
     output:
     count  : QSD
     survivals  : Survival rate of QSM
     '''
-    domain = [g(0,0)[1], g(0,0)[2]]
+    domain = g(0,0)[1]
     partition = np.linspace(domain[0],domain[1],N2+1)
     
     #initalize output
