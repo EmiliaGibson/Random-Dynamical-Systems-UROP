@@ -1,0 +1,116 @@
+# a few maps 
+
+def g(omega,x):
+    """
+    maps from [-1,1]x[-1,1] to R
+    parameters:
+    omega: a random sample of size 1 drawn from a uniform[-1,1] dist
+    x: float in [-1,1]
+    outputs:
+    float : value of mapping of x
+    -1 : min value of domain of mapping
+    1  : max value of domain of mapping
+    1  : upper bound of omega
+    """
+    return 2*x + omega, -1 , 1, 1
+
+def g2(omega,x):
+    """
+    maps from [-1,1]x[-2,2] to R
+    parameters:
+    omega: a random sample of size 1 drawn from a uniform[-1,1] dist
+    x: float in [-2,2]
+    outputs:
+    float in R: value of mapping of x
+    -2 : min value of domain of mapping
+    2  : max value of domain of mapping
+    1  : upper bound of omega
+    """
+    return np.power(x,3) + 6*omega, -2 ,2 , 1
+
+def g3(omega,x):
+    """
+    maps from [-m,m]x[0,1] to R
+    parameters:
+    omega: a random sample of size 1 drawn from a uniform [-m,m] dist
+    x: float in [0,1]
+    outputs:
+    float in R: value of mapping of x
+    0 : min value of domain of mapping
+    1  : max value of domain of mapping
+    m  : upper bound of omega
+    """
+    return 1/(1+np.exp(-x)) + omega, 0 , 1, m
+
+def g4(omega, x):
+    """
+    maps from [-1/4,1/4]x[0,1] to R
+    parameters:
+    omega: a random sample of size 1 drawn from a uniform [-m,m] dist
+    x: float in [0,1]
+    outputs:
+    float in R: value of mapping of x
+    0 : min value of domain of mapping
+    1  : max value of domain of mapping
+    m  : upper bound of omega
+    """
+    return np.exp(1)*x/(1+(np.exp(1)-1)*x) + omega, 0, 1, 0.25
+
+# Monte Carlo method for QSD
+def MCQSD(g,N,N2):
+    '''
+    parameters: 
+    g  : function outputting a map from Ω=[-m,m] x domain --> R, lower bound of domain, upper bound of domain, m  
+    N  : integer - length of trajectory  
+    N2  : integer - number of subintervals to divide domain into
+    output:
+    count  : QSD
+    survivals  : Survival rate of QSM
+    '''
+    domain = [g(0,0)[1], g(0,0)[2]]
+    partition = np.linspace(domain[0],domain[1],N2+1)
+    
+    #initalize output
+    count=np.zeros(N2)
+    
+    # Ω = [-m,m]
+    m = g(0,0)[3]
+    
+    #list of previous points of trajectory inside domain
+    x_tracker=np.zeros(N+1)
+    x_tracker[0] = np.random.uniform(domain[0],domain[1])
+    
+    #store killing times
+    killing_times=[0]
+    
+    intervals = np.zeros((N2,2))
+    for j in range(N2):
+        intervals[j]= partition[j], partition[j+1]
+    
+    
+    for n in range(N):
+        #print percentage of for loops completed
+        progressbar(n,N)
+        
+        #move trajectory forward one timestep 
+        newx = g(np.random.uniform(-m,m),x_tracker[n])[0]
+        
+        #find out which subinterval the new point lies, if any 
+        add =  np.ndarray.flatten(indicator_fast(np.asarray([newx]),intervals))
+        
+        #record point's location (in domain)
+        count += add
+        
+        #if point lies outside domain, resample from empirical distribution
+        if np.sum(add)==0:
+            killing_times.append(n+1)
+            x_tracker[n+1] = x_tracker[int(n*np.random.uniform(0,1))]
+        
+        else:
+            x_tracker[n+1] = newx
+    #calculate survival rate        
+    survivals = np.mean([killing_times[i+1]-killing_times[i] for i in range(len(killing_times)-1)])
+    
+    #calculate aprroximate QSD
+    count = count/(N*((partition[1]-partition[0])**2))
+    return count, survivals    
