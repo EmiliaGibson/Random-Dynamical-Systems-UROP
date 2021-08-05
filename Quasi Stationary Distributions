@@ -14,11 +14,10 @@ def g(omega,x):
     x: float in [-1,1]
     outputs:
     float : value of mapping of x
-    -1 : min value of domain of mapping
-    1  : max value of domain of mapping
+    (-1,1) : domain of mapping
     1  : upper bound of omega
     """
-    return 2*x + omega, -1 , 1, 1
+    return 2*x + omega, (-1 , 1), 1
 
 def g2(omega,x):
     """
@@ -28,11 +27,10 @@ def g2(omega,x):
     x: float in [-2,2]
     outputs:
     float in R: value of mapping of x
-    -2 : min value of domain of mapping
-    2  : max value of domain of mapping
+    (-2, 2) : domain of mapping
     1  : upper bound of omega
     """
-    return np.power(x,3) + 6*omega, -2 ,2 , 1
+    return np.power(x,3) + 6*omega, (-2 ,2) , 1
 
 def g3(omega,x):
     """
@@ -42,11 +40,10 @@ def g3(omega,x):
     x: float in [0,1]
     outputs:
     float in R: value of mapping of x
-    0 : min value of domain of mapping
-    1  : max value of domain of mapping
+    (0, 1) :  domain of mapping
     m  : upper bound of omega
     """
-    return 1/(1+np.exp(-x)) + omega, 0 , 1, m
+    return 1/(1+np.exp(-x)) + omega, (0 , 1), m
 
 def g4(omega, x):
     """
@@ -56,11 +53,11 @@ def g4(omega, x):
     x: float in [0,1]
     outputs:
     float in R: value of mapping of x
-    0 : min value of domain of mapping
-    1  : max value of domain of mapping
+    (0, 1) : domain of mapping
     m  : upper bound of omega
     """
-    return np.exp(1)*x/(1+(np.exp(1)-1)*x) + omega, 0, 1, 0.25
+    return np.exp(1)*x/(1+(np.exp(1)-1)*x) + omega, (0, 1), 0.25
+
 
 # Monte Carlo method for QSD
 def MCQSD(g,N,N2):
@@ -107,7 +104,7 @@ def MCQSD(g,N,N2):
         #record point's location (in domain)
         count += add
         
-        #if point lies outside domain, resample from empirical distribution
+        #if point lies outside domain, resample from trajectory history using empirical distribution
         if np.sum(add)==0:
             killing_times.append(n+1)
             x_tracker[n+1] = x_tracker[int(n*np.random.uniform(0,1))]
