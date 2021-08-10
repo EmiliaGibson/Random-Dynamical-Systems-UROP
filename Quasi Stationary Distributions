@@ -68,7 +68,7 @@ def MCQSD(g,N,N2,domain,Ω):
 
 def g(omega,x):
     """
-    maps from [-1,1]x[-1,1] to R
+    maps from [-1,1]x[-1,1] to [-1,1] with escape
     parameters:
     omega: a random sample of size 1 drawn from a uniform[-1,1] dist
     x: float in [-1,1]
@@ -79,7 +79,7 @@ def g(omega,x):
 
 def g2(omega,x):
     """
-    maps from [-1,1]x[-2,2] to R
+    maps from [-1,1]x[-2,2] to [-2,2] with escape
     parameters:
     omega: a random sample of size 1 drawn from a uniform[-1,1] dist
     x: float in [-2,2]
@@ -89,7 +89,7 @@ def g2(omega,x):
     return np.power(x,3) + 6*omega
 def g3(omega,x):
     """
-    maps from [-m,m]x[0,1] to R
+    maps from [-m,m]x[0,1] to [0,1] with escape
     parameters:
     omega: a random sample of size 1 drawn from a uniform [-m,m] dist
     x: float in [0,1]
@@ -100,7 +100,7 @@ def g3(omega,x):
 
 def g4(omega, x):
     """
-    maps from [-1/4,1/4]x[0,1] to R
+    maps from [-1/4,1/4]x[0,1] to [0,1] with escape
     parameters:
     omega: a random sample of size 1 drawn from a uniform [-m,m] dist
     x: float in [0,1]
@@ -110,6 +110,14 @@ def g4(omega, x):
     return np.exp(1)*x/(1+(np.exp(1)-1)*x) + omega
 
 def g5(omega, x):
+    """
+    maps from [-1,1]x[-1,1] to [-1,1] with escape
+    parameters:
+    omega: a random sample of size 1 drawn from a uniform [-1,1] dist
+    x: float in [-1,1]
+    output:
+    float in R: value of mapping of x
+    """
     return x + np.power(x,3) + omega
 
 
@@ -123,9 +131,8 @@ plt.show()
 #eg
 k=300
 omega=np.random.uniform(-1,1,size=k)
-test=prob_mat(k,g)
+test=prob_mat(k,g,[-1,1],[-1,1])
 z,lmda= stationarydist(test)
 print(lmda)
 plt.figure(figsize=(10,6))
-plt.plot(np.linspace(-1,1,k),1/np.trapz(np.abs(z),np.linspace(-1,1,len(z)))*np.abs(z))
-plt.ylim(0,1);
+plt.plot(np.linspace(-1,1,len(z)),1/np.trapz(np.abs(z),np.linspace(-1,1,len(z)))*np.abs(z))
