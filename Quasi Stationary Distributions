@@ -117,3 +117,15 @@ def g5(omega, x):
 test = MCQSD(g, 10**7,1000)
 plt.plot(np.linspace(-1,1,len(test[0])),test[0]/np.trapz(test[0],np.linspace(-1,1,len(test[0]))))
 plt.show()
+
+
+#QSDs can also be computed using Ulam's method
+#eg
+k=300
+omega=np.random.uniform(-1,1,size=k)
+test=prob_mat(k,g)
+z,lmda= stationarydist(test)
+print(lmda)
+plt.figure(figsize=(10,6))
+plt.plot(np.linspace(-1,1,k),1/np.trapz(np.abs(z),np.linspace(-1,1,len(z)))*np.abs(z))
+plt.ylim(0,1);
