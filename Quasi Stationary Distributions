@@ -4,57 +4,12 @@ from numpy import linalg as LA
 from scipy import sparse
 from scipy.sparse.linalg import eigs
 
-# a few maps 
-
-def g(omega,x):
-    """
-    maps from [-1,1]x[-1,1] to R
-    parameters:
-    omega: a random sample of size 1 drawn from a uniform[-1,1] dist
-    x: float in [-1,1]
-    output:
-    float : value of mapping of x
-    """
-    return 2*x + omega
-
-def g2(omega,x):
-    """
-    maps from [-1,1]x[-2,2] to R
-    parameters:
-    omega: a random sample of size 1 drawn from a uniform[-1,1] dist
-    x: float in [-2,2]
-    output:
-    float in R: value of mapping of x
-    """
-    return np.power(x,3) + 6*omega
-def g3(omega,x):
-    """
-    maps from [-m,m]x[0,1] to R
-    parameters:
-    omega: a random sample of size 1 drawn from a uniform [-m,m] dist
-    x: float in [0,1]
-    output:
-    float in R: value of mapping of x
-    """
-    return 1/(1+np.exp(-x)) + omega
-
-def g4(omega, x):
-    """
-    maps from [-1/4,1/4]x[0,1] to R
-    parameters:
-    omega: a random sample of size 1 drawn from a uniform [-m,m] dist
-    x: float in [0,1]
-    output:
-    float in R: value of mapping of x
-    """
-    return np.exp(1)*x/(1+(np.exp(1)-1)*x) + omega
-
 
 # Monte Carlo method for QSD
 def MCQSD(g,N,N2,domain,Ω):
     '''
     parameters: 
-    g  : function outputting a map from Ω x domain --> R, domain, m  
+    g  : function outputting a map from Ω x domain --> domain, with escape  
     N  : integer - length of trajectory  
     N2  : integer - number of subintervals to divide domain into
     domain : interval in R 
@@ -107,3 +62,58 @@ def MCQSD(g,N,N2,domain,Ω):
     #calculate aprroximate QSD
     count = count/(N*((partition[1]-partition[0])**2))
     return count, survivals    
+
+
+# a few maps 
+
+def g(omega,x):
+    """
+    maps from [-1,1]x[-1,1] to R
+    parameters:
+    omega: a random sample of size 1 drawn from a uniform[-1,1] dist
+    x: float in [-1,1]
+    output:
+    float : value of mapping of x
+    """
+    return 2*x + omega
+
+def g2(omega,x):
+    """
+    maps from [-1,1]x[-2,2] to R
+    parameters:
+    omega: a random sample of size 1 drawn from a uniform[-1,1] dist
+    x: float in [-2,2]
+    output:
+    float in R: value of mapping of x
+    """
+    return np.power(x,3) + 6*omega
+def g3(omega,x):
+    """
+    maps from [-m,m]x[0,1] to R
+    parameters:
+    omega: a random sample of size 1 drawn from a uniform [-m,m] dist
+    x: float in [0,1]
+    output:
+    float in R: value of mapping of x
+    """
+    return 1/(1+np.exp(-x)) + omega
+
+def g4(omega, x):
+    """
+    maps from [-1/4,1/4]x[0,1] to R
+    parameters:
+    omega: a random sample of size 1 drawn from a uniform [-m,m] dist
+    x: float in [0,1]
+    output:
+    float in R: value of mapping of x
+    """
+    return np.exp(1)*x/(1+(np.exp(1)-1)*x) + omega
+
+def g5(omega, x):
+    return x + np.power(x,3) + omega
+
+
+#plotting example
+test = MCQSD(g, 10**7,1000)
+plt.plot(np.linspace(-1,1,len(test[0])),test[0]/np.trapz(test[0],np.linspace(-1,1,len(test[0]))))
+plt.show()
