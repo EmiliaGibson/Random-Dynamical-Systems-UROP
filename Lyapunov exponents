@@ -47,12 +47,12 @@ def exp_f(w,x):
     return 0.5*w*((np.sign(w-2*x*w)+1)*(np.log(abs(w-2*x*w))-1) -((np.sign(w-2*x*w)-1))*(np.log(abs(2*x-1)*w)-1))
 
 mu = MCQSD(f,10**6,1000,[1.75,4],[0,1])[0]
-top_lyap(exp_f, [1.75,4], mu, [0,1])
+top_lyap(mu, exp_f, [1.75,4], [0,1])
 
 n=500
 test = prob_mat(n,f,[1.75,4],[0,1])
 mu_ulam = stationarydist(test)[0]
-top_lyap(exp_f, [1.75,4], mu_ulam, [0,1])
+top_lyap(mu_ulam, exp_f, [1.75,4], [0,1])
 
 
 
