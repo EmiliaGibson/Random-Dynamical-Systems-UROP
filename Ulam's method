@@ -136,3 +136,94 @@ mu2 = stationarydist(test2)[0]
 # plotting stationary measures
 plt.plot(np.linspace(-1,1,len(mu)),1/np.trapz(np.abs(mu),np.linspace(-1,1,len(mu)))*np.abs(mu))
 plt.plot(np.linspace(-1,1,len(mu2)),1/np.trapz(np.abs(mu2),np.linspace(-1,1,len(mu2)))*np.abs(mu2))
+
+
+# approximating Ulam's method
+# quicker but less accurate method to obtain stationary measure
+
+def indicator_fast(x,intervals):
+    """
+    indicator function
+    parameters:
+    x  : float array
+    intervals  : intervals in R to pass indicator function through
+    output:
+    2d array of ones and zeros 
+    """
+    a , b = intervals[:,0][np.newaxis].T, intervals[:,1][np.newaxis].T
+    x = np.ndarray.flatten(x)
+    out1 = (np.heaviside(x-a,0) - np.heaviside(x-b,0))
+    return  out1
+
+
+def p_fast(x,intervals,f,Ω):
+    """
+    Markov Kernel 
+    parameters:
+    x: float array
+    intervals: intervals in R to pass indicator function through
+    f: function with output: a mapping from Ωxdomain to domain
+    Ω: interval in R from which noise values are drawn from uniformly
+    output:
+    float array
+    """
+    omega= np.linspace(Ω[0],Ω[1],100)
+    x = np.ndarray.flatten(x)
+    xs = f(omega,np.transpose([x,]))[0]
+    z = indicator_fast(xs,intervals)
+    return 1/(Ω[1]-Ω[0])*np.trapz(z,omega,axis=1)
+
+
+def prob_mat_alt(n,f,n2,Ω,domain):
+    """
+    Approximates the Perron-Frobenius operator of f by averaging the markov kernel at n3 points inside each subinterval
+    parameters:
+    n : number of equal subintervals to be created from the domain of f
+    f: function with output: mapping from RxR to R, domain of f
+    n2 : number of points to average
+    output:
+    n2xn2 stochastic matrix
+    """
+    
+    #length of each subinterval
+    h = (domain[1]-domain[0])/n2  
+    
+    #create partition of the domain of f
+    partition = np.linspace(domain[0],domain[1],n2+1)
+    
+    #initialise output matrix
+    out = np.zeros((n2,n2))
+    
+    #get intervals of domain
+    intervals = np.zeros((n2,2))
+    for j in range(n2):
+        intervals[j]= partition[j], partition[j+1]
+        
+    for i in range(n2):
+        progressbar(i,n2)
+        
+        # stores the values to be averaged
+        ave = np.zeros((n3,n2))
+        
+        for j in range(n3):
+            x=np.asarray([np.random.uniform(partition[i],partition[i+1])])
+            ave[j,:] =p_fast(x,intervals,f,Ω)
+            
+        out[i,:]= np.mean(ave,axis=0)
+
+    return out
+    
+    
+# a few examples
+k=1500
+test3=prob_mat_alt(k,f,1,[-1,1],[-1,1])
+z3= stationarydist(test3)[0]
+
+test4=prob_mat_alt(k,f2,1,[-1,1],[-2,2])
+z4 = stationarydist(test4)[0]
+
+#plotting
+plt.figure()
+plt.plot(np.linspace(-1,1,len(z3)),1/np.trapz(np.abs(z3),np.linspace(-1,1,len(z3)))*np.abs(z3))
+plt.figure()
+plt.plot(np.linspace(-2,2,len(z3)),1/np.trapz(np.abs(z4),np.linspace(-2,2,len(z4)))*np.abs(z4))
