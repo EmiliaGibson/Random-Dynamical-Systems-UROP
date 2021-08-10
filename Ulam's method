@@ -138,8 +138,8 @@ plt.plot(np.linspace(-1,1,len(mu)),1/np.trapz(np.abs(mu),np.linspace(-1,1,len(mu
 plt.plot(np.linspace(-1,1,len(mu2)),1/np.trapz(np.abs(mu2),np.linspace(-1,1,len(mu2)))*np.abs(mu2))
 
 
-# approximating Ulam's method
-# quicker but less accurate method to obtain stationary measure
+# alternative method
+# quicker but less accurate method to obtain stationary measure by evaluating the Markov kernel at single points
 
 def indicator_fast(x,intervals):
     """
