@@ -53,12 +53,12 @@ def progressbar(i,n,refresh_rate = 1, i_start = 0):
     if (int(output)==output):
         print(str(np.round((i+1-i_start)/n*100,2))+'%', end ="\r")
 
-def prob_mat(n2,f,Ω,domain): 
+def prob_mat(n,f,Ω,domain): 
     
     """
     Perron-Frobenius operator
     parameter:
-    n2 : number of equal subintervals to be created from the domain of f
+    n : number of equal subintervals to be created from the domain of f
     f: function outputting: a map from Ω x domain to domain
     Ω: interval in R from which noise values are drawn uniformly
     domain: interval in R
@@ -66,27 +66,33 @@ def prob_mat(n2,f,Ω,domain):
     n2xn2 stochastic matrix
     """
     #length of each subinterval
-    h = (domain[1]-domain[0])/n2  
+    h = (domain[1]-domain[0])/n 
     
     
     #create partition of the domain of f
-    partition = np.linspace(domain[0],domain[1],n2+1)  
+    partition = np.linspace(domain[0],domain[1],n+1)  
 
     #initialise output matrix
-    out = np.zeros((n2,n2))
-    for j in range(n2):
+    out = np.zeros((n,n))
+    for j in range(n):
         #get end points of jth subinterval
         a,b = partition[j], partition[j+1]
-        progressbar(j,n2)
+        progressbar(j,n)
         #numerical integration using trapezium rule 
-        x= np.linspace(domain[0],domain[1],n2*100)
+        x= np.linspace(domain[0],domain[1],n*100)
         y = p(x,a,b,f,Ω) 
-        out[:,j]=  np.array( [np.trapz(y[100*i:100*(i+1)],x[100*i :100*(i+1)])/h for i in range(n2)]) 
+        out[:,j]=  np.array( [np.trapz(y[100*i:100*(i+1)],x[100*i :100*(i+1)])/h for i in range(n)]) 
     return out
 
 
-#getting right eigenvector corresponding to evalue 1
 def stationarydist(mat):
+    """
+    get right eigenvector corresponding to evalue 1
+    paremeters: 
+    mat: square 2d float array
+    oututs:
+    1d float array approximating the stationary measure, max eigenvalue of mat
+    """
     #make matrix sparse  
     mat = sparse.csr_matrix(mat) 
     
@@ -182,30 +188,30 @@ def prob_mat_alt(n,f,n2,Ω,domain):
     f: function with output: mapping from RxR to R, domain of f
     n2 : number of points to average
     output:
-    n2xn2 stochastic matrix
+    nxn stochastic matrix
     """
     
     #length of each subinterval
-    h = (domain[1]-domain[0])/n2  
+    h = (domain[1]-domain[0])/n 
     
     #create partition of the domain of f
-    partition = np.linspace(domain[0],domain[1],n2+1)
+    partition = np.linspace(domain[0],domain[1],n+1)
     
     #initialise output matrix
-    out = np.zeros((n2,n2))
+    out = np.zeros((n,n))
     
     #get intervals of domain
-    intervals = np.zeros((n2,2))
-    for j in range(n2):
+    intervals = np.zeros((n,2))
+    for j in range(n):
         intervals[j]= partition[j], partition[j+1]
         
-    for i in range(n2):
-        progressbar(i,n2)
+    for i in range(n):
+        progressbar(i,n)
         
         # stores the values to be averaged
-        ave = np.zeros((n3,n2))
+        ave = np.zeros((n2,n))
         
-        for j in range(n3):
+        for j in range(n2):
             x=np.asarray([np.random.uniform(partition[i],partition[i+1])])
             ave[j,:] =p_fast(x,intervals,f,Ω)
             
