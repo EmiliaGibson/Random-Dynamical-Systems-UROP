@@ -1,0 +1,138 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from numpy import linalg as LA
+from scipy import sparse
+from scipy.sparse.linalg import eigs
+
+
+# Ulam's method 
+
+def indicator(x,a,b):
+    """
+    simple indicator function
+    parameters:
+    x: float array
+    a: float 
+    b: float >= a 
+    output: 
+    numpy array of ones and zeros -  1 if a<x<b, else 0
+    """
+
+    return np.heaviside(x-a,0) - np.heaviside(x-b,0) 
+
+def p(x,a,b,f,Ω):
+    """
+    Markov Kernel 
+    parameters:
+    x: float array
+    a: float 
+    b: float >= a 
+    f: function mapping from RxR to R
+    Ω: interval in R from which noise values are drawn uniformly
+    output:
+    float
+    """
+    x = x[np.newaxis]
+    x=x.T
+    #numerical integration using trapezium rule 
+    omega= np.linspace(-Ω[0],Ω[1],100)
+    y =indicator(f(omega,x),a,b)
+    out = 1/(Ω[1]-Ω[0])*np.trapz(y,omega)
+    return out
+
+
+def progressbar(i,n,refresh_rate = 1, i_start = 0):
+    '''
+    Approximates how far through the computation you are, by showing a percentage of total loops that have been computed
+    i = loop index
+    n = amount of iterations (max loop index + 1 if i_start = 0)
+    refresh_rate = how often you would like to update the percentage (useful)
+    i_start = start value of loop
+    '''
+    output = (i-i_start)/refresh_rate
+    if (int(output)==output):
+        print(str(np.round((i+1-i_start)/n*100,2))+'%', end ="\r")
+
+def prob_mat(n2,f,Ω,domain): 
+    
+    """
+    Perron-Frobenius operator
+    parameter:
+    n2 : number of equal subintervals to be created from the domain of f
+    f: function outputting: a map from Ω x domain to domain
+    Ω: interval in R from which noise values are drawn uniformly
+    domain: interval in R
+    output:
+    n2xn2 stochastic matrix
+    """
+    #length of each subinterval
+    h = (domain[1]-domain[0])/n2  
+    
+    
+    #create partition of the domain of f
+    partition = np.linspace(domain[0],domain[1],n2+1)  
+
+    #initialise output matrix
+    out = np.zeros((n2,n2))
+    for j in range(n2):
+        #get end points of jth subinterval
+        a,b = partition[j], partition[j+1]
+        progressbar(j,n2)
+        #numerical integration using trapezium rule 
+        x= np.linspace(domain[0],domain[1],n2*100)
+        y = p(x,a,b,f,Ω) 
+        out[:,j]=  np.array( [np.trapz(y[100*i:100*(i+1)],x[100*i :100*(i+1)])/h for i in range(n2)]) 
+    return out
+
+
+#getting right eigenvector corresponding to evalue 1
+def stationarydist(mat):
+    #make matrix sparse  
+    mat = sparse.csr_matrix(mat) 
+    
+    #get largest left eigenvalue
+    evals,evecs = eigs(np.transpose(mat))
+    index = np.argmax(evals)
+    
+    #check evalue is indeed 1
+    print(evals[index])
+    
+    return evecs[:,index]
+
+
+# a few maps
+
+def f(omega, x):
+    """
+    maps from [-1, 1]x[-1, 1] --> [-1,1]
+    parameters:
+    omega: a random sample of size 1 drawn from a uniform[-1,1] dist
+    x: float in [-1,1]
+    output:
+    float in [-1,1]: value of mapping of x
+    """
+    return (x+omega)/2 
+    
+def f2(omega,x):
+    """
+    Maps from [-2,2]x[-1,1] --> [-2,2]
+    parameters:
+    omega: a random sample of size 1 drawn from a uniform[-1,1] dist
+    x: float 
+    output:
+    float in [-2,2] : value of mapping of x 
+    """
+    return np.cbrt(x+6*omega)
+    
+  
+# a few examples
+k=500
+test=prob_mat(k,f,[-1,1],[-1,1])
+mu= stationarydist(test)
+
+test2=prob_mat(k,f2,[-1,1],[-2,2])
+mu2 = stationarydist(test2)
+
+# plotting stationary measures
+plt.plot(np.linspace(-1,1,len(mu)),1/np.trapz(np.abs(mu),np.linspace(-1,1,len(mu)))*np.abs(mu))
+plt.plot(np.linspace(-1,1,len(mu2)),1/np.trapz(np.abs(mu2),np.linspace(-1,1,len(mu2)))*np.abs(mu2))
