@@ -12,12 +12,10 @@ def g(omega,x):
     parameters:
     omega: a random sample of size 1 drawn from a uniform[-1,1] dist
     x: float in [-1,1]
-    outputs:
+    output:
     float : value of mapping of x
-    (-1,1) : domain of mapping
-    1  : upper bound of omega
     """
-    return 2*x + omega, (-1 , 1), 1
+    return 2*x + omega
 
 def g2(omega,x):
     """
@@ -25,25 +23,20 @@ def g2(omega,x):
     parameters:
     omega: a random sample of size 1 drawn from a uniform[-1,1] dist
     x: float in [-2,2]
-    outputs:
+    output:
     float in R: value of mapping of x
-    (-2, 2) : domain of mapping
-    1  : upper bound of omega
     """
-    return np.power(x,3) + 6*omega, (-2 ,2) , 1
-
+    return np.power(x,3) + 6*omega
 def g3(omega,x):
     """
     maps from [-m,m]x[0,1] to R
     parameters:
     omega: a random sample of size 1 drawn from a uniform [-m,m] dist
     x: float in [0,1]
-    outputs:
+    output:
     float in R: value of mapping of x
-    (0, 1) :  domain of mapping
-    m  : upper bound of omega
     """
-    return 1/(1+np.exp(-x)) + omega, (0 , 1), m
+    return 1/(1+np.exp(-x)) + omega
 
 def g4(omega, x):
     """
@@ -51,33 +44,30 @@ def g4(omega, x):
     parameters:
     omega: a random sample of size 1 drawn from a uniform [-m,m] dist
     x: float in [0,1]
-    outputs:
+    output:
     float in R: value of mapping of x
-    (0, 1) : domain of mapping
-    m  : upper bound of omega
     """
-    return np.exp(1)*x/(1+(np.exp(1)-1)*x) + omega, (0, 1), 0.25
+    return np.exp(1)*x/(1+(np.exp(1)-1)*x) + omega
 
 
 # Monte Carlo method for QSD
-def MCQSD(g,N,N2):
+def MCQSD(g,N,N2,domain,Ω):
     '''
     parameters: 
-    g  : function outputting a map from Ω=[-m,m] x domain --> R, domain, m  
+    g  : function outputting a map from Ω x domain --> R, domain, m  
     N  : integer - length of trajectory  
     N2  : integer - number of subintervals to divide domain into
+    domain : interval in R 
+    Ω  : interval in R from which noise values are to be sampled from uniformly
     output:
     count  : QSD
     survivals  : Survival rate of QSM
     '''
-    domain = g(0,0)[1]
     partition = np.linspace(domain[0],domain[1],N2+1)
     
     #initalize output
     count=np.zeros(N2)
     
-    # Ω = [-m,m]
-    m = g(0,0)[3]
     
     #list of previous points of trajectory inside domain
     x_tracker=np.zeros(N+1)
@@ -96,7 +86,7 @@ def MCQSD(g,N,N2):
         progressbar(n,N)
         
         #move trajectory forward one timestep 
-        newx = g(np.random.uniform(-m,m),x_tracker[n])[0]
+        newx = g(np.random.uniform(Ω[0],Ω[1]),x_tracker[n])[0]
         
         #find out which subinterval the new point lies, if any 
         add =  np.ndarray.flatten(indicator_fast(np.asarray([newx]),intervals))
