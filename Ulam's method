@@ -97,7 +97,7 @@ def stationarydist(mat):
     #check evalue is indeed 1
     print(evals[index])
     
-    return evecs[:,index]
+    return evecs[:,index], evals[index]
 
 
 # a few maps
@@ -128,10 +128,10 @@ def f2(omega,x):
 # a few examples
 k=500
 test=prob_mat(k,f,[-1,1],[-1,1])
-mu= stationarydist(test)
+mu= stationarydist(test)[0]
 
 test2=prob_mat(k,f2,[-1,1],[-2,2])
-mu2 = stationarydist(test2)
+mu2 = stationarydist(test2)[0]
 
 # plotting stationary measures
 plt.plot(np.linspace(-1,1,len(mu)),1/np.trapz(np.abs(mu),np.linspace(-1,1,len(mu)))*np.abs(mu))
