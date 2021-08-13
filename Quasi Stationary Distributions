@@ -6,14 +6,13 @@ from scipy.sparse.linalg import eigs
 
 
 # Monte Carlo method for QSD
-def MCQSD(g,N,N2,domain,Ω):
+def MCQSD(g,N,N2,Ω,domain):
     '''
     parameters: 
-    g  : function outputting a map from Ω x domain --> domain, with escape  
+    g  : function mapping from Ω x domain --> R
+    domain  : 1D interval
     N  : integer - length of trajectory  
     N2  : integer - number of subintervals to divide domain into
-    domain : interval in R 
-    Ω  : interval in R from which noise values are to be sampled from uniformly
     output:
     count  : QSD
     survivals  : Survival rate of QSM
@@ -49,7 +48,7 @@ def MCQSD(g,N,N2,domain,Ω):
         #record point's location (in domain)
         count += add
         
-        #if point lies outside domain, resample from trajectory history using empirical distribution
+        #if point lies outside domain, resample from empirical distribution
         if np.sum(add)==0:
             killing_times.append(n+1)
             x_tracker[n+1] = x_tracker[int(n*np.random.uniform(0,1))]
