@@ -4,4 +4,4 @@ conducted at Imperial College London under supervision of PhD student Matheus Ma
 
 The code has been uploaded in a single ipython notebook file (python3), which includes multiple functions used throughout the project. 
 
-This code can be used to approximate stationary distributions for 1d and 2d maps, quasi-statioanry distributions for 1d maps with escape, and for computing top and conditional Lyapunov exponents.
+This code can be used to approximate stationary distributions for 1d and 2d maps, quasi-stationary distributions for 1d maps with escape, and for computing top and conditional Lyapunov exponents.
