@@ -168,7 +168,7 @@ def prob_mat_2D_alt(n,f,n2,Ω,domain):
     domain: interval in R^2
     output:
     n^2 x n^2  stochastic matrix
-    ""    
+    """    
     
     #create partitions
     partition_x = np.linspace(domain[0][0],domain[0][1],n+1)
