@@ -35,7 +35,7 @@ def p(x,a,b,f,Ω):
     x = x[np.newaxis]
     x=x.T
     #numerical integration using trapezium rule 
-    omega= np.linspace(-Ω[0],Ω[1],100)
+    omega= np.linspace(Ω[0],Ω[1],100)
     y =indicator(f(omega,x),a,b)
     out = 1/(Ω[1]-Ω[0])*np.trapz(y,omega)
     return out
