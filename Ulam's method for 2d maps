@@ -119,7 +119,7 @@ def prob_mat_2D(n,f,Ω,domain):
 
 
 
-def indicator_2D_fast(xx,yy,boxes,Ω):
+def indicator_2D_fast(xx,yy,boxes):
     """
     indicator function for R^2
     parameters:
